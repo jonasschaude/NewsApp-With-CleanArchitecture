@@ -137,7 +137,7 @@ class ArticleDetailViewModelTests: XCTestCase {
     func testOnAppear__CallsUrlSessionWithImageUrl() {
         // Arrange
         let imageUrl = URL(string: "http://imageUrlExample.com")!
-        let article = ArticleEntityBuilder.new().with(imageUrl: imageUrl).build()
+        let article = ArticleEntityBuilder.new().with(imageURL: imageUrl).build()
         sut.article = ArticleListUiTileBuilder.new().with(article: article).build()
         
         // Act
@@ -145,19 +145,19 @@ class ArticleDetailViewModelTests: XCTestCase {
 
         // Assert
         XCTAssertEqual(mockURLSession.dataTaskCalledCounter, 1)
-        XCTAssertEqual(mockURLSession.receivedURL, imageUrl)
+        XCTAssertEqual(mockURLSession.receivedDataTaskURL, imageUrl)
     }
     
     func testOnAppear_WithRetrievedData_UpdatesImageData() {
         // Arrange
         let imageUrl = URL(string: "http://imageUrlExample.com")!
-        let article = ArticleEntityBuilder.new().with(imageUrl: imageUrl).build()
+        let article = ArticleEntityBuilder.new().with(imageURL: imageUrl).build()
         sut.article = ArticleListUiTileBuilder.new().with(article: article).build()
         let data = "as".data(using: .utf8)
         
         // Act
         sut.onAppear()
-        mockURLSession.receivedCompletionHandler?(data, nil, nil)
+        mockURLSession.receivedDataTaskCompletionHandler?(data, nil, nil)
 
         // Assert
         XCTAssertEqual(sut.imageData, data)
@@ -166,13 +166,15 @@ class ArticleDetailViewModelTests: XCTestCase {
     func testOnAppear__DataTaskResumeCalledOnce() {
         // Arrange
         let imageUrl = URL(string: "http://imageUrlExample.com")!
-        let article = ArticleEntityBuilder.new().with(imageUrl: imageUrl).build()
+        let article = ArticleEntityBuilder.new().with(imageURL: imageUrl).build()
         sut.article = ArticleListUiTileBuilder.new().with(article: article).build()
+        let mockURLSessionDataTask = MockURLSessionDataTask()
+        mockURLSession.dataTaskReturnURLSessionDataTask = mockURLSessionDataTask
         
         // Act
         sut.onAppear()
 
         // Assert
-        XCTAssertEqual(mockURLSession.mockURLSessionDataTask.resumeCalledCounter, 1)
+        XCTAssertEqual(mockURLSessionDataTask.resumeCalledCounter, 1)
     }
 }
